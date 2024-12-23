@@ -1,0 +1,15 @@
+---
+// This is Astro's frontmatter
+// here you can write regular JavaScript or TypeScript
+// It will only run on the server and never executes client-side
+const title = "Flavio PM's resume";
+import Resume from '../components/Resume.astro';
+import Layout from '../layouts/Layout.astro';
+
+// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
+// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+---
+
+<Layout title="title" >
+	<Resume />
+</Layout>
