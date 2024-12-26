@@ -1,0 +1,138 @@
+<html>
+  <head>
+    <title>Raw HTML Test</title>
+  </head>
+  <body>
+    <main>
+        <div class="background" id="bg"></div>
+        <div id="maindiv">
+            <div class="control">
+              <p>Slide 1 visibility: <span id="slide1vis"></span></p>
+              <p>Slide 2 visibility: <span id="slide2vis"></span></p>
+              <p>Slide 3 visibility: <span id="slide3vis"></span></p>
+              <p>Slide 4 visibility: <span id="slide4vis"></span></p>
+            </div>
+            <div class="slide" id="slide1">
+                <p>This is a slide</p>
+            </div>
+            <div class="slide" id="slide2">
+                <p>This is a slide</p>
+            </div>
+            <div class="slide" id="slide3">
+                <p>This is a slide</p>
+            </div>
+            <div class="slide" id="slide4">
+                <p>This is a slide</p>
+            </div>
+        </div>
+    </main>
+  </body>
+</html>
+
+<style>
+    html,
+	body {
+        margin: 0;
+		width: 100%;
+		height: 100%;
+	}
+    .background {
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        z-index: -5;
+        transition: all 0.2s;
+    }
+    .slide { min-height: 100vh }
+    .control {
+        display: block;
+        position: fixed;
+        right: 0%;
+        width: 15vh;
+        background-color: aqua;
+        border: 3px solid teal;
+    }
+</style>
+
+<script>
+    // Global variables
+    let controllers = [1, 0, 0, 0];
+    let bgpointer = null;
+    let bgColors = [
+        [222,   184,    135 ],
+        [0,     0,      0   ],
+        [72,    61,     139 ],
+        [240,   255,    240 ]
+    ];
+    let secColors = [
+        [214,   158,    100  ],
+        [0,     128,    128 ],
+        [255,   140,    0   ],
+        [127,   255,    212 ]
+    ];
+
+    window.addEventListener('load', () => {
+        bgPointer = document.querySelector("#bg")
+        // Observer options setup
+        let threshold = [];
+        for(i=0; i<=1; i+=(1/20)){
+            threshold.push(i)
+        }
+        const options = {
+            threshold: threshold
+        }
+
+        // Observer callback function
+        const observer = new IntersectionObserver((entries) => {
+            let s1Flag = false;       // check if slide1 needs value update
+            // Update value
+            entries.forEach(entry => {
+                const index = parseInt(entry.target.id[5]) - 1
+                controllers[index] = entry.intersectionRatio.toFixed(4);
+                s1Flag = s1Flag || index == 1
+            })
+            // Update slide1 if needed
+            if (s1Flag) {
+                let inverse = controllers.slice(1, 4).reduce((ps, a) => ps + parseFloat(a), 0)
+                controllers[0] = (1 - inverse).toFixed(4)
+            }
+            // Show new values in control panel
+            controllers.forEach((ratio, index) => {
+                let div = document.querySelector(`#slide${index+1}vis`);
+                div.innerHTML = ratio;
+            })
+            // truncate ratios for color adjustment
+            const translateRatio = (ratio) => {
+                if      (ratio <= 0.25) { return 0; }
+                else if (ratio <= 0.75) { return ratio * 2 - 0.5; }
+                else                    { return 1; }
+            }
+            // truncate values for each channel
+            const truncateValue = (value => {
+                if      (value > 255) { return 255;   }
+                else if (value < 0)   { return 0;     }
+                else                  { return value; }
+            })
+            // calculate new background colors
+            let nbc = [0, 0, 0];
+            let nsc = [0, 0, 0];
+            for (channel in nbc) {
+                controllers.forEach((ratio, index) => {
+                    nbc[channel] = nbc[channel] + parseInt(bgColors[index][channel] * translateRatio(ratio))
+                    nsc[channel] = nsc[channel] + parseInt(secColors[index][channel] * translateRatio(ratio))
+                })
+                // prevent overflow
+                nbc[channel] = truncateValue(nbc[channel])
+                nsc[channel] = truncateValue(nsc[channel])
+            }
+           bgPointer.style.background = `radial-gradient(ellipse at bottom, rgb(${nsc[0]}, ${nsc[1]}, ${nsc[2]}) 15%, rgb(${nbc[0]}, ${nbc[1]}, ${nbc[2]}) 75%)`
+        }, options)
+
+        // finish observer setup
+        for(i=2; i<=4; i++){
+            const slideId = "#slide" + i
+            observer.observe(document.querySelector(slideId))
+        }
+    })
+  
+  </script>

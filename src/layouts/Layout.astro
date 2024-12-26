@@ -1,15 +1,17 @@
 ---
+// import Backdrop from '../components/Backdrop.vue'
+
 const { title } = Astro.props
 ---
 
 <html>
   <head>
-    <!-- Astro uses a JSX-like syntax in it's body -->
     <title>{title}</title>
   </head>
   <body>
     <main>
-		<slot />
+      <!--Backdrop client:idle /-->
+  		<slot />
     </main>
   </body>
 </html>

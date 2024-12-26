@@ -2,9 +2,29 @@
 import Slide from '../components/Slide.astro'
 ---
 
-<div>
-    <Slide />
-    <Slide />
-    <Slide />
-    <Slide />
+<div id="maindiv">
+  <div class="control">
+    <p>Slide 1 visibility: <span id="slide1vis"></span></p>
+    <p>Slide 2 visibility: <span id="slide2vis"></span></p>
+    <p>Slide 3 visibility: <span id="slide3vis"></span></p>
+    <p>Slide 4 visibility: <span id="slide4vis"></span></p>
+  </div>
+  <Slide id="slide1" />
+  <Slide id="slide2" />
+  <Slide id="slide3" />
+  <Slide id="slide4" />
 </div>
+
+<style>
+  .control {
+    display: block;
+    position: fixed;
+    right: 0%;
+    width: 15vh;
+    background-color: aqua;
+    border: 3px solid teal;
+  }
+</style>
+
+<script>
+</script>
