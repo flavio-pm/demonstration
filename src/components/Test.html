@@ -45,7 +45,7 @@
         z-index: -5;
         transition: all 0.2s;
     }
-    .slide { min-height: 150vh }
+    .slide { min-height: 100vh }
     .control {
         display: block;
         position: fixed;
@@ -59,15 +59,16 @@
 <script>
     // Global variables
     let controllers = [1, 0, 0, 0];
-    let bgpointer = null;
+    let bgPointer = null;
+    let bodyPointer = null
     let bgColors = [
-        [222,   184,    135 ],
+        [214,   158,    100],
         [0,     0,      0   ],
         [72,    61,     139 ],
         [240,   255,    240 ]
     ];
     let secColors = [
-        [214,   158,    100 ],
+        [222,   184,    135  ],
         [0,     128,    128 ],
         [255,   140,    0   ],
         [127,   255,    212 ]
@@ -99,7 +100,7 @@
                 // only update if top-down value has changed (to prevent strobing effect)
                 if (controllers[index] == entry.intersectionRatio && 
                     entry.intersectionRatio > 0) 
-                    { return; }
+                    { break; }
                 controllers[index] = entry.intersectionRatio;
             }
             // Show new values in control panel
@@ -135,7 +136,7 @@
                 nsc[channel] = truncateValue(nsc[channel])
                 ntc[channel] = truncateValue(ntc[channel])
             }
-           bgPointer.style.background = `radial-gradient(ellipse at bottom, rgb(${nsc[0]}, ${nsc[1]}, ${nsc[2]}) 15%, rgb(${nbc[0]}, ${nbc[1]}, ${nbc[2]}) 75%)`
+           bgPointer.style.background = `radial-gradient(ellipse at bottom 15% right 33%, rgb(${nsc[0]}, ${nsc[1]}, ${nsc[2]}) 15%, rgb(${nbc[0]}, ${nbc[1]}, ${nbc[2]}) 75%)`
            bodyPointer.style.color = `rgb(${ntc[0]}, ${ntc[1]}, ${ntc[2]})`
         }, options)
 
