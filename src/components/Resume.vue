@@ -2,6 +2,7 @@
   import { onMounted, useTemplateRef, ref, computed } from 'vue';
   import Background from './ResumeBg.vue';
 
+  //Background props data
   const slides = [
     useTemplateRef('slide1'),
     useTemplateRef('slide2'),
@@ -14,8 +15,15 @@
   const c_name = ref('')
   const c_email = ref('')
   const c_body = ref('')
+  const isPressed = ref(false)
 
-  // emit control
+  // standalone methods
+  const c_press = () => {
+    if (isPressed.value) { return }
+    else { isPressed.value = true; }
+  }
+
+  // emission control methods
   const updateTc = (newColor) => {
     textColor.value = `rgb(${newColor[0]}, ${newColor[1]}, ${newColor[2]})`
   }
@@ -157,35 +165,52 @@
       </div>
     </div>
     <div ref="slide4" id="slide4" class="slide">
-      <embed class="pdf" src="../../public/resume.pdf">
-      <p>I am currently available for freelance web development work and for hiring into larger projects.</p>
-      <p>If you're interested in my work, don't hesitate to reach out!</p>
-      <div class="card">
-        <form class="card-form" onsubmit="return false">
-          <label>
-            Your name:
-            <div class="form-divider"></div>
-            <!-- input type="text" name="c-name" class="fullwidth text"><br-->
-            <input v-model="c_name" placeholder="Jean Doe">
-          </label><br>
-          <label>
-            Your email address:  
-            <div class="form-divider"></div>
-            <!-- input type="email" name="c-email" class="fullwidth text"><br-->
-            <input v-model="c_email" placeholder="Jeandoe@gmail.com">
-          </label><br>
-          <label>
-            Email body: 
-            <div class="form-divider"></div>
-            <!--textarea name="c-body" class="fullwidth text" rows="5"></textarea><br-->
-            <textarea v-model="c_body"></textarea>
-          </label><br>
-          <div class="btn-holder">
-            <input type="submit" value="Send" class="send-btn"><br>
+      <div class="fullwidth">
+        <p>I am currently available for freelance web development work and for hiring into larger projects.</p>
+        <div class="contain">
+          <div class="smaller mr1em">
+            <h3>Formal, one-page resume pdf:</h3>
+            
+            <object class="pdf" 
+                    data= "../../public/resume.pdf"
+                    width="100%"
+                    height="500">
+            </object>
+            <!-- embed class="pdf" src="../../public/resume.pdf" -->
           </div>
-        </form>
-        <!--Formulario-->
-        <!-- Conviertelo en notificaciones pop-up -->
+          <div class="larger ml1em">
+            <h3>Contact form:</h3>
+            <p>If you're interested in my work, don't hesitate to reach out!</p>
+            <div class="card">
+              <form class="card-form" onsubmit="return false">
+                <label>
+                  Your name:
+                  <!-- input type="text" name="c-name" class="fullwidth text"><br-->
+                  <input v-model="c_name" placeholder="Jean Doe" class="fullwidth mt1em mb1em">
+                </label><br>
+                <label>
+                  Your email address:  
+                  <!-- input type="email" name="c-email" class="fullwidth text"><br-->
+                  <input v-model="c_email" placeholder="Jeandoe@gmail.com" class="fullwidth mt1em mb1em">
+                </label><br>
+                <label>
+                  Email body: 
+                  <!--textarea name="c-body" class="fullwidth text" rows="5"></textarea><br-->
+                  <textarea v-model="c_body" class="fullwidth mt1em mb1em" rows="5"></textarea>
+                </label><br>
+                <div class="btn-holder">
+                  <input type="submit" value="Send" class="send-btn" 
+                    :class="{pressed: isPressed}" @click="c_press"
+                  ><br>
+                </div>
+              </form>
+              <!--Formulario-->
+            </div>
+          </div>
+        </div>
+        <div class="fullwidth mt1em tac">
+          <a href="#slide1" class="top-btn">Return to top.</a>
+        </div>
       </div>
     </div>
   </div>
@@ -195,13 +220,15 @@
   html { scroll-behavior: smooth; }
   body { font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; }
   table, th, td { border: 1px solid; }
-  .slide { min-height: 100vh; }
   .contain { display: flex; } /* This may be causing issues with the parallax */
   .autom { margin: auto; }
   .smaller { width: 45%; }
   .larger { width: 55%; }
   .fullwidth { width: 100%; }
   .mr1em { margin-right: 1em; }
+  .ml1em { margin-left: 1em; }
+  .mt1em { margin-top: 1em; }
+  .mb1em { margin-bottom: 1em; }
   
   .aid {
     position: fixed;
@@ -213,20 +240,27 @@
     top: -8px;
     font-size: 16pt;
   }
-
-  #slide1 {
+  
+  .slide {
+    min-height: 100vh;
     padding: 5vh 10vw 0;
-    overflow: hidden;
-    text-shadow: 2px 2px #CE884A
   }
 
+  #slide1 {
+    overflow: hidden;
+    text-shadow: 2px 2px #CE884A;
+  }
+
+  #slide1 a:link, #slide1 a:visited { color: linen; }
+  #slide1 a:active, #slide1 a:hover { color: pink; }
+ 
   #slide2 { 
     font-family: "Lucida Console", "Courier New", monospace; 
     font-size: 12pt;
   }
 
-  a:link { color: orange }
-  a:visited { color: pink }
+  #slide2 a:link { color: orange }
+  #slide2 a:visited { color: pink }
   
   .slide2-in { 
     padding: 10vh 5vw;
@@ -239,13 +273,14 @@
     margin: 25vh 0;
   }
   
-  .slide3 { 
+  #slide3 { 
     font-family: 'Edu QLD Beginner', cursive;
   }
   
   #slide4 { 
-    padding: 5vh 15vw 10vh;
     height: calc(85vh - 8px);
+    display: flex;
+    align-items: center;
   }
 
   img.fill {
@@ -272,33 +307,78 @@
   }
 
   .card {
-    width: 50vw;
-    height: 70vh;
+    width: 85%;
     background-color: #B0EBD7;
     border-radius: 10%;
     box-shadow: 1vw 1vh 1.5vw aquamarine;  /* Make this into parallax! */
     margin: 0 auto;
-    font-size: larger;  /* Read into this to figure out responsive sizes */
   }
-
+  
   .card-form { padding: 10%; }
   .card-form label { padding: 0 0 16px }
-  .card-form input { padding: 2px 0 4px }
+  .card-form input { padding: 2px 8px 4px; }
+  .card-form textarea { resize: none }
   .card-form .form-divider { height: 8px }
   .card-form .btn-holder { text-align: right; }
-  .card-form .text { font-size: 14pt; }
-  .card-form .send-btn {
-    background-color: green;
-    color: white;
-    font-size: larger;
-    padding: 1vh 1vw;
-    margin: 0 2vh 0 0;
-    border: none;
-    box-shadow: 2px 1px 2px gray;
-    border-radius: 15%;
+
+  .card-form textarea, .card-form input {
+    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+    box-sizing: border-box;         /* Opera/IE 8+ */
   }
 
-   /* Tooltip container */
+  .card-form .send-btn {
+    background-color: seagreen;
+    font-size: large;
+    color: white;
+    padding: 1vh 1vw;
+    margin: auto 0 5vh;
+    border: none;
+    box-shadow: 3px 2px 3px teal;
+    border-radius: 15%;
+    transition: all 0.2s;
+  }
+
+  .card-form .send-btn:hover { 
+    background-color: mediumseagreen; 
+    box-shadow: 3px 2px 3px seagreen;
+  }
+
+  .card-form .send-btn:active { 
+    transition: all 0s;
+    background-color: yellowgreen; 
+    box-shadow: 3px 2px 3px seagreen;
+  }
+
+  .card-form .send-btn.pressed { 
+    background-color: cadetblue; 
+    box-shadow: 3px 2px 3px steelblue;
+  }
+
+  .tac { text-align: center; }
+  .top-btn {
+    color: white;
+    padding: 1vh 1vw;
+    margin: auto 0 5vh;
+    border: none;
+    box-shadow: 1vw 1vh 1.5vw #BFFFEA;
+    border-radius: 10%;
+    transition: all 0.2s;
+  }
+
+  a.top-btn:link,   a.top-btn:visited { background-color: rgb(201, 184, 237); }
+  a.top-btn:active, a.top-btn:hover   { background-color: mediumpurple; }
+
+  /* Storebought CSS lol */
+  .vertical-center {
+    margin: 0;
+    position: relative; 
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+  }
+
+  /* Tooltip container */
   .tool {
     position: relative;
     display: inline-block;

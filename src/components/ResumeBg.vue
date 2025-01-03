@@ -64,9 +64,9 @@
       let modulus = controllers.reduce((ps, a) => ps + a, 0);
       const translateRatio = (ratio, modulus) => {
         let normal = ratio/modulus
-        if      (normal <= 0.25) { return 0; }
-        else if (normal <= 0.75) { return normal * 2 - 0.5; }
-        else                    { return 1; }
+        if      (normal <= 0.15)  { return 0; }
+        else if (normal < 0.85)   { return (normal - 0.15)/0.7; }
+        else                      { return 1; }
       }
       // fx: truncate values for each channel
       const truncateValue = (value => {
