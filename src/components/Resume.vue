@@ -1,6 +1,7 @@
 <script setup>
-  import { onMounted, useTemplateRef, ref, computed } from 'vue';
-  import Background from './ResumeBg.vue';
+  import { useTemplateRef, ref, computed, onUpdated, onMounted } from 'vue';
+  import Background                                   from './ResumeBg.vue';
+  import S3Parallax                                   from './s3Parallax.vue';
 
   //Background props data
   const slides = [
@@ -9,13 +10,16 @@
     useTemplateRef('slide3'),
     useTemplateRef('slide4'),
   ]
+  let slide3Height = ref(0);
+  let slide3OT     = ref(0);
 
   //data
-  const textColor = ref('rgb(228, 242, 247)')
-  const c_name = ref('')
-  const c_email = ref('')
-  const c_body = ref('')
-  const isPressed = ref(false)
+  const c_name = ref('');
+  const c_email = ref('');
+  const c_body = ref('');
+  const isPressed = ref(false);
+  const s3pos = ref(0);
+  const textColor = ref('rgb(228, 242, 247)');
 
   // standalone methods
   const c_press = () => {
@@ -28,14 +32,35 @@
     textColor.value = `rgb(${newColor[0]}, ${newColor[1]}, ${newColor[2]})`
   }
 
+  const emitS3pos = (position) => {
+    s3pos.value = position;
+  }
+
   // computed data
   const globalStyle = computed(() => ({
     color: textColor.value
   }))
+
+  const opacity = computed(() => ({
+    opacity: s3pos.value/2
+  }))
+
+
+  onMounted(() => { 
+    slide3Height.value = slides[2].value.scrollHeight;
+    slide3OT.value     = slides[2].value.offsetTop;
+  })
+
+  onUpdated(() => { 
+    slide3Height.value = slides[2].value.scrollHeight;
+    slide3OT.value     = slides[2].value.offsetTop;
+    console.log(slide3Height.value)
+  })
+  // i think i need a watcher for those values instead lmao
 </script>
 
 <template>
-  <Background :anchors="slides" @tcUpdate="updateTc" />
+  <Background :anchors="slides" @tcUpdate="updateTc" @s3pos="emitS3pos" />
   <div class="content" :style="globalStyle">
     <div ref="slide1" id="slide1" class="slide">
       <div class="contain">
@@ -111,57 +136,66 @@
     </div>
     <div ref="slide3" id="slide3" class="slide">
       <div class="slide3-in">
-        <h2>Education</h2>
-        <p class="central-s2">I have studied for web development, but I also have a deep-set interest in the arts, particularly 2.5D illustration.</p>
-        <table class="exp-table">
-          <tr class="et-row">
-            <td rowspan="3" class="et-year">2015 -- 2020</td>
-            <td class="et-title">
-              <h3>Titulo de Ingenieria Civil en Informatica y Telecomunicaciones
-                <sup class="tool">TR
-                  <h6 class="tooltip">Computer Science and Telecommunications Engineering Degree (Bachelor of Science equivalent)</h6>
-                </sup>
-              </h3>
-            </td>
-          </tr>
-          <tr class="et-row">
-            <td class="et-school"><span class="fa-solid fa-graduation-cap mr1em"></span>Universidad Diego Portales</td>
-          </tr>
-          <tr class="et-row">
-            <td class="et-desc">
-              <ul>
-                <li>11 semester program with courses on Computer Science and Software Engineering, IT projects management, and digital telecommunications networks.</li>
-                <li>Electives taken include Large Volume Database Management, Internet of Things and Inclusivity Technologies.</li>
-              </ul>
-            </td>
-          </tr>
-          <tr class="et-row">
-            <td rowspan="3" class="et-year">2018</td>
-            <td class="et-title">
-              <h3>Study Abroad semester</h3>
-            </td>
-            <tr class="et-row">
-              <td class="et-school"><span class="fa-solid fa-graduation-cap mr1em"></span>King's College London</td>
-            </tr>
-            <tr class="et-row">
-              <td class="et-desc">
-                <ul>
-                  <li>International student exchange program in one of the best colleges in the world, entirely in English.</li>
-                  <li>Electives taken include Artificial Intelligence and Computer Graphics Systems.</li>
-                </ul>
-              </td>
-            </tr>
-          </tr>
-          <tr class="et-row">
-            <td rowspan="2" class="et-year">2000 -- 2011</td>
-            <td class="et-title">
-              <h3>Primary and Secondary Education</h3>
-            </td>
-          </tr>
-          <tr class="et-row">
-            <td class="et-school"><span class="fa-solid fa-school mr1em"></span>Colegio de los Sagrados Corazones</td>
-          </tr>
-        </table>
+        <S3Parallax 
+          :style="opacity"
+          :s3pos="s3pos"
+          :height="slide3Height"
+          :offsetTop="slide3OT" /><!-- Make it a lazy load cunt  -->
+        <div class="card">
+          <div class="marginalizator">          
+            <h2>Education</h2>
+            <p class="central-s2">I have studied for web development, but I also have a deep-set interest in the arts, particularly 2.5D animation.</p>
+            <table class="exp-table">
+              <tr class="et-row">
+                <td rowspan="3" class="et-year">2015 -- 2020</td>
+                <td class="et-title">
+                  <h3>Titulo de Ingenieria Civil en Informatica y Telecomunicaciones
+                    <sup class="tool">TR
+                      <h6 class="tooltip">Computer Science and Telecommunications Engineering Degree (Bachelor of Science equivalent)</h6>
+                    </sup>
+                  </h3>
+                </td>
+              </tr>
+              <tr class="et-row">
+                <td class="et-school"><span class="fa-solid fa-graduation-cap mr1em"></span>Universidad Diego Portales</td>
+              </tr>
+              <tr class="et-row">
+                <td class="et-desc">
+                  <ul>
+                    <li>11 semester program with courses on Computer Science and Software Engineering, IT projects management, and digital telecommunications networks.</li>
+                    <li>Electives taken include Large Volume Database Management, Internet of Things and Inclusivity Technologies.</li>
+                  </ul>
+                </td>
+              </tr>
+              <tr class="et-row">
+                <td rowspan="3" class="et-year">2018</td>
+                <td class="et-title">
+                  <h3>Study Abroad semester</h3>
+                </td>
+                <tr class="et-row">
+                  <td class="et-school"><span class="fa-solid fa-graduation-cap mr1em"></span>King's College London</td>
+                </tr>
+                <tr class="et-row">
+                  <td class="et-desc">
+                    <ul>
+                      <li>International student exchange program in one of the best colleges in the world, entirely in English.</li>
+                      <li>Electives taken include Artificial Intelligence and Computer Graphics Systems.</li>
+                    </ul>
+                  </td>
+                </tr>
+              </tr>
+              <tr class="et-row">
+                <td rowspan="2" class="et-year">2000 -- 2011</td>
+                <td class="et-title">
+                  <h3>Primary and Secondary Education</h3>
+                </td>
+              </tr>
+              <tr class="et-row">
+                <td class="et-school"><span class="fa-solid fa-school mr1em"></span>Colegio de los Sagrados Corazones</td>
+              </tr>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
     <div ref="slide4" id="slide4" class="slide">
@@ -172,7 +206,7 @@
             <h3>Formal, one-page resume pdf:</h3>
             
             <object class="pdf" 
-                    data= "../../public/resume.pdf"
+                    data= "/resume.pdf"
                     width="100%"
                     height="500">
             </object>
@@ -267,11 +301,7 @@
     margin: 25vh 0;
   }
   
-  .slide3-in { 
-    font-size: large;
-    padding: 10vh 5% 10vh 11%;
-    margin: 25vh 0;
-  }
+  .slide3-in { margin: 10vh 0; }
   
   #slide3 { 
     font-family: 'Edu QLD Beginner', cursive;
@@ -288,30 +318,29 @@
     padding: 5vw;
   }
 
-  .canvas {
-    overflow: hidden;
-  }
-
-  .student-layer {
-    position: absolute;
-    overflow: hidden;
-    width: inherit;
-    height: inherit;
-  }
-
-  .student-image {
-    display: flex;
-    position: relative;
-    width: 100%;
-    height: auto;
-  }
-
   .card {
-    width: 85%;
-    background-color: #B0EBD7;
     border-radius: 10%;
-    box-shadow: 1vw 1vh 1.5vw aquamarine;  /* Make this into parallax! */
+  }
+  
+  #slide3 .card {
+    opacity: 75%;
+    background-color: #801349;
+    font-size: medium;
+    padding: 5%;
+    width: 67%;
+    box-shadow: 1vw 1vh 1.5vw #372F407f;  /* Make this into parallax! */
+    text-shadow: 1px 1px #261C21;
+  }
+  
+  .marginalizator {
+    width: 67%
+  }
+  
+  #slide4 .card {
+    background-color: #B0EBD7;    
     margin: 0 auto;
+    width: 85%;
+    box-shadow: 1vw 1vh 1.5vw aquamarine;  /* Make this into parallax! */
   }
   
   .card-form { padding: 10%; }
