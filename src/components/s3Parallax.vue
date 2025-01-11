@@ -1,12 +1,12 @@
 <script setup>
-  import { reactive, ref, defineProps, onMounted, onUpdated, computed, watchEffect } from 'vue';
+  import { reactive, ref, defineProps, onMounted, onUpdated, computed, watch } from 'vue';
 
   // the original pictures were drawn on this resolution
   const ref_res = 1440
   const init_pos = {
     book:    { width:  653, left:  310, bottom:  -56 },
     rarm:    { width:  199, left:  518, bottom: -315 },
-    larm:    { width:  461, right:  97, bottom: -380 },
+    larm:    { width:  461, right:  97, bottom: -280 },
     student: { width:  799, right:  17, top:     -29 },
     tree:    { width: 1388, right:   0, top:    -380 },
     clouds4: { width:  953, left: -186, top:     117 },
@@ -15,6 +15,18 @@
     clouds1: { width:  708, left:   21, bottom:   72 },
   }
   
+  const max_trans = {
+    book:    { x:    0, y: -150 },
+    rarm:    { x:    0, y: -150 },
+    larm:    { x:    0, y: -150 },
+    student: { x:    0, y: -150 },
+    tree:    { x:    0, y: -380 },
+    clouds4: { x: -240, y:    0 },
+    clouds3: { x: -160, y:    0 },
+    clouds2: { x:  -80, y:    0 },
+    clouds1: { x:  -80, y:    0 },
+  }
+
   // props
   const props = defineProps({
     s3pos: Number,
@@ -35,32 +47,45 @@
     scrollY = window.scrollY;
     width = window.innerWidth;
     res_ratio = width/ref_res;
-    console.log(`px_ratio = height/(scrollY-offsetTop)`)
-    console.log(`${px_ratio} = ${props.height}/(${scrollY}-${props.offsetTop})`)
     let ret = {}
     for (let layer in init_pos) {
       let aux = {}
       for (let property in init_pos[layer]) {
-        aux[property] = `${parseInt((property == 'width')? init_pos[layer][property]*res_ratio: init_pos[layer][property]*res_ratio)}px`
+        aux[property] = `${parseInt(init_pos[layer][property]*res_ratio)}px`
       }
       ret[layer] = aux
     }
     styles.value = ret
-    console.log(styles.value)
   }
 
   const sizeUpdate = (e) => {
     updatePositions()
   }
 
-  watchEffect(async () => {
-    // scrollY = window.scrollY
-    px_ratio = props.height/(scrollY-props.offsetTop)
-    console.log(`Updated: height. PX ratio: ${px_ratio}`)
+  const parallax = (e) => {
+    scrollY = window.scrollY
+    px_ratio = (props.offsetTop - scrollY)/props.height
+    for (let layer in max_trans) {
+      let aux = {}
+      for (let property in max_trans[layer]) {
+        aux[property] = px_ratio * max_trans[layer][property]
+      }
+      styles.value[layer]['transform'] = `translate(${aux['x']}px, ${aux['y']}px)`
+    }
+  }
+
+  watch(() => props.height, (value) => {
+    scrollY = window.scrollY;
+    px_ratio = value/(scrollY - props.offsetTop)
+  })
+
+  watch(() => props.offsetTop, (value) => {
+    px_ratio = props.height/(scrollY - value)
   })
 
   onMounted(() => {
     window.addEventListener("resize", sizeUpdate)
+    window.addEventListener("scroll", parallax)
     updatePositions()
   })
 </script>

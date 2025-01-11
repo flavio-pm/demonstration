@@ -1,5 +1,5 @@
 <script setup>
-  import { useTemplateRef, ref, computed, onUpdated, onMounted } from 'vue';
+  import { useTemplateRef, ref, computed, onUpdated, onMounted, watch } from 'vue';
   import Background                                   from './ResumeBg.vue';
   import S3Parallax                                   from './s3Parallax.vue';
 
@@ -54,7 +54,6 @@
   onUpdated(() => { 
     slide3Height.value = slides[2].value.scrollHeight;
     slide3OT.value     = slides[2].value.offsetTop;
-    console.log(slide3Height.value)
   })
   // i think i need a watcher for those values instead lmao
 </script>
@@ -297,11 +296,10 @@
   #slide2 a:visited { color: pink }
   
   .slide2-in { 
-    padding: 10vh 5vw;
-    margin: 25vh 0;
+    padding: 25vh 5vw;
   }
   
-  .slide3-in { margin: 10vh 0; }
+  .slide3-in { padding: 25vh 0; }
   
   #slide3 { 
     font-family: 'Edu QLD Beginner', cursive;
